@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f233f">
+  <title>AGV Control Center · Giám sát & Điều hành kho thông minh</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-lockup">
+      <div class="brand-mark" aria-hidden="true"><span>AGV</span><i></i></div>
+      <div class="brand-copy">
+        <p class="eyebrow">HỆ THỐNG ĐIỀU HÀNH KHO</p>
+        <h1>Trung tâm Giám sát & Điều phối AGV</h1>
+      </div>
+    </div>
+    <div class="topbar-status">
+      <div class="connection-chip" id="serverConnection"><span class="status-dot"></span><span>Đang kết nối máy chủ...</span></div>
+      <div class="connection-chip vehicle-chip" id="vehicleConnection"><span class="status-dot"></span><span>Đang chờ dữ liệu xe</span></div>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <!-- Thanh điều khiển & Nút Dừng Khẩn Cấp thu gọn -->
+    <section class="command-bar">
+      <div class="welcome-info">
+        <p class="eyebrow section-eyebrow">BẢNG ĐIỀU HÀNH TRỰC TUYẾN</p>
+        <h2>Hệ thống Kho vận Tự động</h2>
+        <div class="last-sync-inline">
+          <span class="sync-icon">↻</span>
+          <span>Cập nhật lúc: <strong id="updatedAt">Chưa có dữ liệu</strong></span>
+        </div>
+      </div>
+
+      <div class="emergency-buttons" id="emergencyPanel">
+        <button type="button" class="btn-estop" id="btnEmergencyStop">
+          <span class="estop-ring">🛑</span>
+          <span class="estop-label">DỪNG KHẨN CẤP</span>
+        </button>
+        <button type="button" class="btn-resume hidden" id="btnResumeVehicle">
+          <span>▶ CHO PHÉP CHẠY LẠI</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Khung cảnh báo vật cản hoặc dừng khẩn cấp -->
+    <section class="alert-card hidden" id="alertBox" role="alert" aria-live="assertive">
+      <div class="alert-symbol" aria-hidden="true">!</div>
+      <div class="alert-copy">
+        <div class="alert-heading">
+          <span class="alert-kicker" id="alertKicker">CẦN CHÚ Ý</span>
+          <span class="alert-state" id="alertState">XE ĐANG DỪNG</span>
+        </div>
+        <h2 id="alertTitle">Phát hiện vật cản</h2>
+        <p id="alertText">Xe đã dừng để bảo đảm an toàn. Đang chờ đường thoáng để tự động tiếp tục hành trình.</p>
+      </div>
+    </section>
+
+    <!-- 3 Thẻ thông số chính của xe AGV -->
+    <section class="metrics-grid" aria-label="Thông tin xe AGV">
+      <article class="metric-card metric-weight">
+        <div class="metric-top">
+          <div class="metric-icon weight-icon" aria-hidden="true">⚖</div>
+          <span class="metric-tag tag-blue" style="opacity: 0; pointer-events: none;">-</span>
+        </div>
+        <p class="metric-label">Khối lượng hàng hiện tại</p>
+        <div class="metric-value"><strong id="weight">--</strong><span>g</span></div>
+        <p class="metric-foot" id="loadLevel">Loại hàng: chưa xác định</p>
+        <div class="metric-track"><span id="weightTrack"></span></div>
+      </article>
+
+      <article class="metric-card metric-status">
+        <div class="metric-top">
+          <div class="metric-icon status-icon" aria-hidden="true">➤</div>
+          <span class="metric-tag tag-green" id="statusTag">TRẠNG THÁI</span>
+        </div>
+        <p class="metric-label">Trạng thái vận hành xe</p>
+        <div class="status-main">
+          <span class="large-status-dot" id="largeStatusDot"></span>
+          <strong id="status">Chưa có dữ liệu</strong>
+        </div>
+        <p class="metric-foot" id="statusDescription">Đang chờ dữ liệu từ ESP32.</p>
+        <div class="status-divider"></div>
+        <div class="mini-row"><span>Mã thiết bị</span><strong id="deviceId">AGV01</strong></div>
+      </article>
+
+      <article class="metric-card metric-trip">
+        <div class="metric-top">
+          <div class="metric-icon trip-icon" aria-hidden="true">▤</div>
+          <span class="metric-tag tag-purple">ĐIỀU PHỐI</span>
+        </div>
+        <p class="metric-label">Điểm giao gần nhất</p>
+        <div class="metric-value trip-value"><strong id="lastWarehouse">--</strong></div>
+        <div class="status-divider"></div>
+        <div class="mini-row"><span>Mã chuyến gần nhất</span><strong id="lastTrip">Chưa có</strong></div>
+      </article>
+    </section>
+
+    <!-- Khu vực Quản lý Kho -->
+    <section class="section-block">
+      <div class="section-title-row">
+        <div>
+          <p class="eyebrow section-eyebrow">QUẢN LÝ KHO</p>
+          <h2>Tổng quan kho hàng</h2>
+        </div>
+        <div class="section-actions">
+          <button type="button" class="btn-outline" id="btnExportAll">⬇ Xuất CSV Toàn Bộ Kho</button>
+        </div>
+      </div>
+
+      <div class="warehouse-grid">
+        <!-- KHO 1 -->
+        <article class="warehouse-card warehouse-one">
+          <div class="warehouse-banner">
+            <div class="warehouse-symbol">01</div>
+            <div>
+              <span class="warehouse-caption">PHÂN LUỒNG HÀNG NHẸ</span>
+              <h3>Kho 1</h3>
+            </div>
+            <span class="warehouse-status" id="kho1CapTag">0% SỨC CHỨA</span>
+          </div>
+
+          <div class="warehouse-body">
+            <div class="warehouse-stats-row">
+              <div class="warehouse-count">
+                <strong id="kho1Total">0</strong>
+                <span>kiện đã nhận</span>
+              </div>
+              <div class="warehouse-substats">
+                <div><span>Tổng khối lượng:</span> <strong id="kho1Weight">0 g</strong></div>
+                <div><span>Nhập gần nhất:</span> <strong id="kho1LastTime">--</strong></div>
+              </div>
+            </div>
+
+            <div class="capacity-bar">
+              <div class="capacity-fill fill-blue" id="kho1Progress" style="width: 0%"></div>
+            </div>
+
+            <div class="warehouse-actions">
+              <button type="button" class="wh-btn wh-btn-filter" data-filter="KHO1">🔍 Xem lịch sử Kho 1</button>
+              <button type="button" class="wh-btn wh-btn-export" data-export="KHO1">📥 Xuất Excel (CSV)</button>
+              <button type="button" class="wh-btn wh-btn-print" data-print="KHO1">🖨 In phiếu kho</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- KHO 2 -->
+        <article class="warehouse-card warehouse-two">
+          <div class="warehouse-banner">
+            <div class="warehouse-symbol">02</div>
+            <div>
+              <span class="warehouse-caption">PHÂN LUỒNG HÀNG NẶNG</span>
+              <h3>Kho 2</h3>
+            </div>
+            <span class="warehouse-status" id="kho2CapTag">0% SỨC CHỨA</span>
+          </div>
+
+          <div class="warehouse-body">
+            <div class="warehouse-stats-row">
+              <div class="warehouse-count">
+                <strong id="kho2Total">0</strong>
+                <span>kiện đã nhận</span>
+              </div>
+              <div class="warehouse-substats">
+                <div><span>Tổng khối lượng:</span> <strong id="kho2Weight">0 g</strong></div>
+                <div><span>Nhập gần nhất:</span> <strong id="kho2LastTime">--</strong></div>
+              </div>
+            </div>
+
+            <div class="capacity-bar">
+              <div class="capacity-fill fill-purple" id="kho2Progress" style="width: 0%"></div>
+            </div>
+
+            <div class="warehouse-actions">
+              <button type="button" class="wh-btn wh-btn-filter" data-filter="KHO2">🔍 Xem lịch sử Kho 2</button>
+              <button type="button" class="wh-btn wh-btn-export" data-export="KHO2">📥 Xuất Excel (CSV)</button>
+              <button type="button" class="wh-btn wh-btn-print" data-print="KHO2">🖨 In phiếu kho</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Bảng Lịch sử giao hàng có bộ lọc theo từng kho -->
+    <section class="section-block history-card" id="historySection">
+      <div class="section-title-row history-title-row">
+        <div>
+          <p class="eyebrow section-eyebrow">NHẬT KÝ HỆ THỐNG</p>
+          <h2>Lịch sử giao nhận hàng</h2>
+          <p class="muted">Lưu thời gian, mã chuyến, kho nhận và khối lượng hàng được giao.</p>
+        </div>
+
+        <div class="history-controls">
+          <div class="filter-tabs" role="tablist">
+            <button type="button" class="filter-tab active" data-tab="ALL" id="tabAll">Tất cả (0)</button>
+            <button type="button" class="filter-tab" data-tab="KHO1" id="tabKho1">Kho 1 (0)</button>
+            <button type="button" class="filter-tab" data-tab="KHO2" id="tabKho2">Kho 2 (0)</button>
+          </div>
+          <div class="history-counter">
+            <strong id="historyCount">0</strong>
+            <span>chuyến hiển thị</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Thời gian giao</th>
+              <th>Mã chuyến</th>
+              <th>Kho nhận</th>
+              <th>Loại hàng</th>
+              <th>Khối lượng</th>
+              <th>Kết quả</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr>
+              <td colspan="6" class="empty-cell">
+                <span class="empty-icon">▤</span>
+                <strong>Chưa có lịch sử giao hàng</strong>
+                <small>Dữ liệu sẽ xuất hiện khi ESP32 gửi xác nhận giao hàng hợp lệ.</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <span><span class="footer-dot"></span> Dữ liệu được đồng bộ thời gian thực với máy chủ</span>
+        <span id="historyFooter">Đang xem: Tất cả các kho</span>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>Hệ thống giám sát & điều khiển xe tự hành trong kho</span>
+    </footer>
+  </main>
+
+  <!-- HỘP THOẠI TÙY CHỌN NGÀY XUẤT EXCEL / IN PHIẾU KHO -->
+  <div class="modal-backdrop hidden" id="reportModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="modal-badge" id="modalBadge">TRÍCH XUẤT DỮ LIỆU</span>
+          <h3 id="modalTitle">Trích xuất dữ liệu kho</h3>
+        </div>
+        <button type="button" class="modal-close" id="btnCloseModal" aria-label="Đóng">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="quick-today-box">
+          <div class="quick-today-info">
+            <strong>⚡ Thao tác nhanh trong ngày</strong>
+            <small id="todayDateLabel">Lấy toàn bộ dữ liệu giao nhận của ngày hôm nay</small>
+          </div>
+          <button type="button" class="btn-quick-today" id="btnQuickToday">
+            ⚡ Xuất / In nhanh hôm nay
+          </button>
+        </div>
+
+        <div class="modal-divider"><span>HOẶC LỌC THEO KHOẢNG NGÀY</span></div>
+
+        <div class="preset-chips">
+          <button type="button" class="preset-chip" data-preset="TODAY">Hôm nay</button>
+          <button type="button" class="preset-chip" data-preset="7DAYS">7 ngày qua</button>
+          <button type="button" class="preset-chip active" data-preset="ALL">Toàn bộ thời gian</button>
+        </div>
+
+        <div class="date-range-grid">
+          <label class="date-field">
+            <span>Từ ngày</span>
+            <input type="date" id="filterFromDate">
+          </label>
+          <label class="date-field">
+            <span>Đến ngày</span>
+            <input type="date" id="filterToDate">
+          </label>
+        </div>
+
+        <div class="preview-summary" id="modalPreviewBox">
+          <span>Số chuyến thỏa mãn: <strong id="previewCount">0 chuyến</strong></span>
+          <span>Tổng khối lượng: <strong id="previewWeight">0 g</strong></span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" id="btnCancelModal">Hủy bỏ</button>
+        <button type="button" class="btn-modal-confirm" id="btnConfirmModal">📥 Xác nhận trích xuất</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast thông báo nổi -->
+  <div id="toastBox" class="toast hidden"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

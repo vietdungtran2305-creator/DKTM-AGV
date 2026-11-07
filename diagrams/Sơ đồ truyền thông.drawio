@@ -1,0 +1,44 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Trang-1" id="VLu9IdV4CXADNNWdUOQl">
+    <mxGraphModel dx="968" dy="635" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="yt79WzeJKaCOzXe2RxSD-3" edge="1" parent="1" source="yt79WzeJKaCOzXe2RxSD-1" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;curveGeometry=1;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;defaultLabelBackgroundColor=page;startSize=8;endSize=8;startArrow=classic;startFill=1;" target="yt79WzeJKaCOzXe2RxSD-2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="yt79WzeJKaCOzXe2RxSD-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Xe AGV - ESP32&lt;div&gt;Thu thập dữ liệu và điều khiển chuyển động&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="340" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="yt79WzeJKaCOzXe2RxSD-5" edge="1" parent="1" source="yt79WzeJKaCOzXe2RxSD-2" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;curveGeometry=1;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;defaultLabelBackgroundColor=page;startSize=8;endSize=8;startArrow=classic;startFill=1;" target="yt79WzeJKaCOzXe2RxSD-4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="yt79WzeJKaCOzXe2RxSD-2" parent="1" style="whiteSpace=wrap;html=1;rounded=1;roundedPerimeter=1;" value="Router Wifi&lt;div&gt;Truyền dữ liệu HTTP trên nền TCP/IP&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="350" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="yt79WzeJKaCOzXe2RxSD-7" edge="1" parent="1" source="yt79WzeJKaCOzXe2RxSD-4" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;curveGeometry=1;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;defaultLabelBackgroundColor=page;startSize=8;endSize=8;" target="yt79WzeJKaCOzXe2RxSD-6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="yt79WzeJKaCOzXe2RxSD-4" parent="1" style="whiteSpace=wrap;html=1;rounded=1;roundedPerimeter=1;" value="Máy chủ Flask - Laptop&lt;div&gt;Xử lý API và quản lý trạng thái AGV&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="350" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="yt79WzeJKaCOzXe2RxSD-6" parent="1" style="whiteSpace=wrap;html=1;rounded=1;roundedPerimeter=1;" value="SQLite&lt;div&gt;Lưu lịch sử và dữ liệu vào kho&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="250" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="yt79WzeJKaCOzXe2RxSD-9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Website&lt;div&gt;Giám sát và quản lý&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="450" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="yt79WzeJKaCOzXe2RxSD-10" edge="1" parent="1" source="yt79WzeJKaCOzXe2RxSD-4" style="endArrow=classic;html=1;rounded=0;fontSize=12;defaultLabelBackgroundColor=page;startSize=8;endSize=8;curved=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;startArrow=classic;startFill=1;" target="yt79WzeJKaCOzXe2RxSD-9" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="410" y="370" />
+              <mxPoint x="510" y="370" />
+            </Array>
+            <mxPoint x="440" y="410" as="sourcePoint" />
+            <mxPoint x="490" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
